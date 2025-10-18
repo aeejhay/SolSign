@@ -109,3 +109,9 @@ Thumbs.db
 # Lock files (keep package-lock.json but ignore others)
 yarn.lock
 pnpm-lock.yaml
+
+# Excluded project files
+create-token.js
+set-metadata.js
+soul_adrian.json
+transfer-tokens.js
