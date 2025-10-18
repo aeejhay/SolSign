@@ -1,4 +1,5 @@
 import MenuBar from './MenuBar';
+import Galaxy from './Galaxy';
 import './Help.css';
 
 const Help = () => {
@@ -6,12 +7,22 @@ const Help = () => {
     <>
       <MenuBar />
       <div className="help-container">
-        <header className="help-header">
-          <h1>About SolSign</h1>
-          <p>Verification and authentication on Solana with signed, on-chain documents.</p>
-        </header>
+        <Galaxy 
+          className="help-galaxy-background"
+          mouseRepulsion={true}
+          mouseInteraction={true}
+          density={1.5}
+          glowIntensity={0.5}
+          saturation={0.8}
+          hueShift={240}
+        />
+        <div className="help-content-overlay">
+          <header className="help-header">
+            <h1>About SolSign</h1>
+            <p>Verification and authentication on Solana with signed, on-chain documents.</p>
+          </header>
 
-        <main className="help-content">
+          <main className="help-content">
           <section className="help-section">
             <h2>Core Capabilities</h2>
             <ul className="help-list">
@@ -60,7 +71,8 @@ const Help = () => {
               multi-sig approvals, or enterprise attestations, let&apos;s collaborate on the design.
             </p>
           </section>
-        </main>
+          </main>
+        </div>
       </div>
     </>
   );

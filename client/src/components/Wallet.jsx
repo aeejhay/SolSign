@@ -3,6 +3,7 @@ import { WalletMultiButton, WalletDisconnectButton } from '@solana/wallet-adapte
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useState, useEffect } from 'react';
 import MenuBar from './MenuBar';
+import Galaxy from './Galaxy';
 import './Wallet.css';
 
 const Wallet = () => {
@@ -48,12 +49,22 @@ const Wallet = () => {
     <>
       <MenuBar />
       <div className="wallet-container">
-        <div className="wallet-header">
-          <h1>Wallet Dashboard</h1>
-          <p>Manage your Solana wallet connection</p>
-        </div>
+        <Galaxy 
+          className="wallet-galaxy-background"
+          mouseRepulsion={true}
+          mouseInteraction={true}
+          density={1.5}
+          glowIntensity={0.5}
+          saturation={0.8}
+          hueShift={240}
+        />
+        <div className="wallet-content-overlay">
+          <div className="wallet-header">
+            <h1>Wallet Dashboard</h1>
+            <p>Manage your Solana wallet connection</p>
+          </div>
 
-        <div className="wallet-content">
+          <div className="wallet-content">
           {connected ? (
             <div className="wallet-connected">
               <div className="wallet-info">
@@ -108,6 +119,7 @@ const Wallet = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import './MenuBar.css';
 import { useWallet } from '@solana/wallet-adapter-react';
+import logo from '../assets/solsignlogo.png'; // Import your logo
 
 const MenuBar = () => {
   const location = useLocation();
@@ -17,8 +18,8 @@ const MenuBar = () => {
         <div className="logo-section">
           <Link to="/" className="logo-link">
             <div className="logo">
+              <img src={logo} alt="SolSign Logo" className="logo-image" />
               <span className="logo-text">SolSign</span>
-              <span className="logo-symbol">🔐</span>
             </div>
           </Link>
         </div>

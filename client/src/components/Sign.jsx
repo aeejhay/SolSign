@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import MenuBar from './MenuBar';
+import Galaxy from './Galaxy';
 import './Sign.css';
 
 // Lazy import to avoid bundling weight until needed
@@ -274,12 +275,22 @@ const Sign = () => {
     <>
       <MenuBar />
       <div className="sign-container">
-        <header className="sign-header">
-          <h1>Sign a Document</h1>
-          <p>Upload a PDF, place your signature, and securely finalize.</p>
-        </header>
+        <Galaxy 
+          className="sign-galaxy-background"
+          mouseRepulsion={true}
+          mouseInteraction={true}
+          density={1.5}
+          glowIntensity={0.5}
+          saturation={0.8}
+          hueShift={240}
+        />
+        <div className="sign-content-overlay">
+          <header className="sign-header">
+            <h1>Sign a Document</h1>
+            <p>Upload a PDF, place your signature, and securely finalize.</p>
+          </header>
 
-        {!connected ? (
+          {!connected ? (
           <div className="sign-gate">
             <p>Please connect your wallet to continue.</p>
             <WalletMultiButton className="connect-button" />
@@ -412,6 +423,7 @@ const Sign = () => {
             </section>
           </main>
         )}
+        </div>
       </div>
     </>
   );

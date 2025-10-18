@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+create-token.js
+set-metadata.js
+soul_adrian.json
+transfer-tokens.js

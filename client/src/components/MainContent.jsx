@@ -3,6 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import MenuBar from './MenuBar';
 import Galaxy from './Galaxy';
+import logo from '../assets/solsignlogo.png';
 import './MainContent.css';
 
 const MainContent = () => {
@@ -45,6 +46,9 @@ const MainContent = () => {
       {/* Main Content Overlay */}
       <div className="content-overlay">
         <div className="content-container">
+          <div className="logo-section">
+            <img src={logo} alt="SolSign Logo" className="main-logo" />
+          </div>
           <h1 className="main-heading">
             Welcome to SolSign
           </h1>

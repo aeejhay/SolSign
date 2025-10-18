@@ -42,9 +42,16 @@
   background-clip: text;
 }
 
-.logo-symbol {
-  font-size: 1.4rem;
+.logo-image {
+  height: 32px;
+  width: auto;
   filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.4));
+  transition: all 0.3s ease;
+}
+
+.logo-image:hover {
+  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
+  transform: scale(1.05);
 }
 
 .nav-links {
@@ -143,8 +150,8 @@
     font-size: 1rem;
   }
   
-  .logo-symbol {
-    font-size: 1.2rem;
+  .logo-image {
+    height: 28px;
   }
   
   .nav-links {
@@ -170,8 +177,8 @@
     font-size: 0.9rem;
   }
   
-  .logo-symbol {
-    font-size: 1.1rem;
+  .logo-image {
+    height: 24px;
   }
   
   .help-link {
