@@ -1,0 +1,219 @@
+.wallet-container {
+  min-height: 100vh;
+  height: 100vh; /* Constrain to viewport for internal scrolling */
+  overflow-y: auto; /* Enable vertical scroll */
+  padding: 2rem;
+  padding-top: 6rem; /* Account for fixed MenuBar */
+  padding-bottom: 6rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.wallet-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.wallet-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #fff, #e0e0e0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wallet-header p {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+.wallet-content {
+  max-width: 800px;
+  margin: 0 auto 8em;
+}
+
+.wallet-connected,
+.wallet-disconnected {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.wallet-info h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #fff;
+}
+
+.walle-info p{
+  text-align: center;
+}
+
+.wallet-details {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.wallet-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wallet-item:last-child {
+  border-bottom: none;
+}
+
+.wallet-item .label {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.wallet-item .value {
+  font-family: 'Courier New', monospace;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+.wallet-actions-section {
+  margin-bottom: 2rem;
+}
+
+.explorer-link-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.explorer-link {
+  color: #64b5f6;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  background: rgba(100, 181, 246, 0.1);
+  border: 1px solid rgba(100, 181, 246, 0.3);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.explorer-link:hover {
+  background: rgba(100, 181, 246, 0.2);
+  border-color: rgba(100, 181, 246, 0.5);
+  transform: translateY(-1px);
+  color: #90caf9;
+  text-decoration: none;
+}
+
+.balance-value {
+  color: #4caf50 !important;
+  font-weight: 600 !important;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.wallet-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Wallet Adapter Button Styles */
+.connect-button,
+.disconnect-button {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  color: white !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3) !important;
+}
+
+.connect-button:hover,
+.disconnect-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4) !important;
+}
+
+.disconnect-button {
+  background: linear-gradient(45deg, #6c5ce7, #a29bfe) !important;
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3) !important;
+}
+
+.disconnect-button:hover {
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .wallet-container {
+    padding: 1rem;
+    padding-top: 3.5rem; /* Slightly smaller top padding on tablet */
+  }
+  
+  .wallet-header h1 {
+    font-size: 2rem;
+  }
+  
+  .wallet-header p {
+    font-size: 1rem;
+  }
+  
+  .wallet-info h2 {
+    font-size: 1.5rem;
+  }
+  
+  .wallet-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .wallet-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .connect-button,
+  .disconnect-button {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .explorer-link {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet-container {
+    padding-top: 3rem; /* Smaller top padding on mobile */
+  }
+}
