@@ -4,12 +4,25 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useState, useEffect } from 'react';
 import MenuBar from './MenuBar';
 import Galaxy from './Galaxy';
+// Simple token balance function without complex imports
+const SOLSIGN_TOKEN_CONFIG = {
+  mintAddress: 'GCKTY2xJ1ZEvnEPnLLrLZXRvKyTr7uDQsq3NBATbDoCw',
+  decimals: 9,
+  symbol: 'SSIGN'
+};
+
+const formatTokenBalance = (balance, decimals) => {
+  if (!balance || balance === 0) return '0';
+  return (balance / Math.pow(10, decimals)).toFixed(4);
+};
 import './Wallet.css';
 
 const Wallet = () => {
   const { publicKey, wallet, connected, disconnect } = useWallet();
   const [balance, setBalance] = useState(0);
+  const [tokenBalance, setTokenBalance] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [tokenLoading, setTokenLoading] = useState(false);
 
   const { connection } = useConnection();
 
@@ -32,11 +45,46 @@ const Wallet = () => {
     }
   };
 
+  const fetchTokenBalance = async () => {
+    if (!publicKey || !connection) {
+      setTokenBalance(0);
+      setTokenLoading(false);
+      return;
+    }
+    
+    setTokenLoading(true);
+    try {
+      // Simple approach: try to get token accounts
+      const tokenAccounts = await connection.getTokenAccountsByOwner(publicKey, {
+        mint: new (await import('@solana/web3.js')).PublicKey(SOLSIGN_TOKEN_CONFIG.mintAddress)
+      });
+      
+      if (tokenAccounts.value.length > 0) {
+        const accountInfo = await connection.getTokenAccountBalance(tokenAccounts.value[0].pubkey);
+        setTokenBalance(accountInfo.value.amount);
+      } else {
+        setTokenBalance(0);
+      }
+    } catch (error) {
+      console.log('Token balance fetch failed:', error.message);
+      setTokenBalance(0);
+    } finally {
+      setTokenLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (connected && publicKey) {
+    if (connected && publicKey && connection) {
       fetchBalance();
+      // Add a longer delay and make token balance optional
+      setTimeout(() => {
+        fetchTokenBalance().catch(error => {
+          console.log('Token balance fetch failed, continuing without it:', error);
+        });
+      }, 2000);
     } else {
       setBalance(0);
+      setTokenBalance(0);
     }
   }, [connected, publicKey, connection]);
 
@@ -79,12 +127,22 @@ const Wallet = () => {
                     <span className="value">{formatAddress(publicKey?.toString())}</span>
                   </div>
                   <div className="wallet-item">
-                    <span className="label">Balance:</span>
+                    <span className="label">SOL Balance:</span>
                     <span className="value balance-value">
                       {loading ? (
                         <span className="loading-spinner">⏳</span>
                       ) : (
                         `${balance.toFixed(4)} SOL`
+                      )}
+                    </span>
+                  </div>
+                  <div className="wallet-item">
+                    <span className="label">SOLSIGN Balance:</span>
+                    <span className="value balance-value">
+                      {tokenLoading ? (
+                        <span className="loading-spinner">⏳</span>
+                      ) : (
+                        `${formatTokenBalance(tokenBalance || 0, SOLSIGN_TOKEN_CONFIG.decimals)} ${SOLSIGN_TOKEN_CONFIG.symbol}`
                       )}
                     </span>
                   </div>

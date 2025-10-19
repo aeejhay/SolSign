@@ -57,6 +57,10 @@
   margin: 0 auto 8em;
 }
 
+.wallet-info {
+  text-align: center;
+}
+
 .wallet-connected,
 .wallet-disconnected {
   background: rgba(255, 255, 255, 0.1);

@@ -39,6 +39,14 @@ const MenuBar = () => {
               Sign
             </Link>
           )}
+          {connected && (
+            <Link 
+              to="/profile" 
+              className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}
+            >
+              Profile
+            </Link>
+          )}
           <Link 
             to="/help" 
             className={`nav-link ${location.pathname === '/help' ? 'active' : ''}`}
