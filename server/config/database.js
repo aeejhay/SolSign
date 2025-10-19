@@ -54,11 +54,18 @@ const initDatabase = async () => {
         phone_number VARCHAR(20),
         wallet_address VARCHAR(44) UNIQUE NOT NULL,
         consent_given BOOLEAN NOT NULL DEFAULT FALSE,
-        verification_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        verification_status ENUM('pending', 'code_sent', 'verified', 'rejected') DEFAULT 'pending',
+        verification_code VARCHAR(6),
+        code_expires_at TIMESTAMP NULL,
+        tokens_rewarded BOOLEAN NOT NULL DEFAULT FALSE,
+        reward_amount DECIMAL(18,9) DEFAULT 8.0,
+        transaction_signature VARCHAR(88),
+        transaction_explorer_url TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_wallet_address (wallet_address),
         INDEX idx_verification_status (verification_status),
+        INDEX idx_verification_code (verification_code),
         INDEX idx_created_at (created_at)
       )
     `);

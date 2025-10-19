@@ -8,6 +8,7 @@ const Profile = () => {
   const { publicKey, connected } = useWallet();
   const [showVerificationForm, setShowVerificationForm] = useState(false);
   const [showConsentMessage, setShowConsentMessage] = useState(false);
+  const [showCodeVerification, setShowCodeVerification] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -15,8 +16,13 @@ const Profile = () => {
     phone: '',
     walletAddress: ''
   });
+  const [verificationCode, setVerificationCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [isResendingCode, setIsResendingCode] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState('not_verified');
+  const [transactionInfo, setTransactionInfo] = useState(null);
 
   // Update wallet address when publicKey changes
   useEffect(() => {
@@ -28,9 +34,35 @@ const Profile = () => {
     }
   }, [publicKey]);
 
+  // Check verification status when wallet connects
+  useEffect(() => {
+    if (connected && publicKey) {
+      checkVerificationStatus();
+    }
+  }, [connected, publicKey]);
+
   const formatAddress = (address) => {
     if (!address) return '';
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
+  const checkVerificationStatus = async () => {
+    try {
+      const response = await fetch(`/api/profile/status/${publicKey.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setVerificationStatus(data.status);
+        if (data.transactionSignature) {
+          setTransactionInfo({
+            signature: data.transactionSignature,
+            explorerUrl: data.explorerUrl,
+            rewardAmount: data.rewardAmount
+          });
+        }
+      }
+    } catch (error) {
+      console.log('No verification record found or error checking status');
+    }
   };
 
   const handleVerifyClick = () => {
@@ -50,6 +82,11 @@ const Profile = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleCodeChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 6); // Only digits, max 6
+    setVerificationCode(value);
   };
 
   const handleSubmit = async (e) => {
@@ -73,14 +110,10 @@ const Profile = () => {
       const result = await response.json();
 
       if (response.ok) {
-        setSubmitMessage('✅ Verification data submitted successfully! We will review your information and contact you if needed.');
+        setSubmitMessage('✅ Verification code sent to your email! Please check your inbox and enter the 6-digit code below.');
         setShowVerificationForm(false);
-        setFormData({
-          username: '',
-          email: '',
-          phone: '',
-          walletAddress: publicKey ? publicKey.toString() : ''
-        });
+        setShowCodeVerification(true);
+        setVerificationStatus('code_sent');
       } else {
         setSubmitMessage(`❌ Error: ${result.message || 'Failed to submit verification data'}`);
       }
@@ -89,6 +122,104 @@ const Profile = () => {
       setSubmitMessage('❌ Error: Failed to submit verification data. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCodeVerification = async (e) => {
+    e.preventDefault();
+    if (verificationCode.length !== 6) {
+      setSubmitMessage('❌ Please enter a valid 6-digit verification code.');
+      return;
+    }
+
+    setIsVerifyingCode(true);
+    setSubmitMessage('');
+
+    try {
+      const response = await fetch('/api/profile/verify-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          verificationCode,
+          walletAddress: publicKey ? publicKey.toString() : ''
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitMessage('🎉 Email verification successful! Welcome to SolSign! 8 SOLSIGN tokens have been sent to your wallet as a welcome reward!');
+        setShowCodeVerification(false);
+        setVerificationStatus('verified');
+        setVerificationCode('');
+        setFormData({
+          username: '',
+          email: '',
+          phone: '',
+          walletAddress: publicKey ? publicKey.toString() : ''
+        });
+        
+        // Store transaction info if available
+        if (result.transactionSignature) {
+          setTransactionInfo({
+            signature: result.transactionSignature,
+            explorerUrl: result.explorerUrl,
+            rewardAmount: result.rewardAmount
+          });
+        }
+      } else {
+        setSubmitMessage(`❌ Error: ${result.message || 'Failed to verify code'}`);
+      }
+    } catch (error) {
+      console.error('Error verifying code:', error);
+      setSubmitMessage('❌ Error: Failed to verify code. Please try again.');
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsResendingCode(true);
+    setSubmitMessage('');
+
+    try {
+      const response = await fetch('/api/profile/resend-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: publicKey ? publicKey.toString() : ''
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitMessage('✅ New verification code sent to your email!');
+      } else {
+        setSubmitMessage(`❌ Error: ${result.message || 'Failed to resend code'}`);
+      }
+    } catch (error) {
+      console.error('Error resending code:', error);
+      setSubmitMessage('❌ Error: Failed to resend code. Please try again.');
+    } finally {
+      setIsResendingCode(false);
+    }
+  };
+
+  const getStatusDisplay = () => {
+    switch (verificationStatus) {
+      case 'verified':
+        return <span className="verification-status verified">✅ Verified</span>;
+      case 'code_sent':
+        return <span className="verification-status pending">📧 Code Sent</span>;
+      case 'pending':
+        return <span className="verification-status pending">⏳ Pending</span>;
+      default:
+        return <span className="verification-status not-verified">❌ Not Verified</span>;
     }
   };
 
@@ -155,14 +286,55 @@ const Profile = () => {
                   </div>
                   <div className="profile-item">
                     <span className="label">Verification Status:</span>
-                    <span className="value verification-status">Not Verified</span>
+                    {getStatusDisplay()}
                   </div>
                 </div>
 
-                {!showVerificationForm && !showConsentMessage && (
+                {verificationStatus === 'verified' && (
+                  <div className="verification-success">
+                    <h3>🎉 Verification Complete!</h3>
+                    <p>Your email has been verified and you've received 8 SOLSIGN tokens as a welcome reward!</p>
+                    <div className="reward-info">
+                      <span className="reward-amount">8 SOLSIGN</span>
+                      <span className="reward-text">Welcome Reward</span>
+                    </div>
+                    
+                    {transactionInfo && (
+                      <div className="transaction-info">
+                        <h4>🔗 Transaction Details</h4>
+                        <div className="transaction-details">
+                          <div className="transaction-item">
+                            <span className="label">Transaction ID:</span>
+                            <span className="value">{transactionInfo.signature.slice(0, 8)}...{transactionInfo.signature.slice(-8)}</span>
+                          </div>
+                          <div className="transaction-item">
+                            <span className="label">Amount:</span>
+                            <span className="value">{transactionInfo.rewardAmount} SOLSIGN</span>
+                          </div>
+                          <div className="transaction-actions">
+                            <a 
+                              href={transactionInfo.explorerUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="explorer-link"
+                            >
+                              🔍 View on Solana Explorer
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {verificationStatus !== 'verified' && !showVerificationForm && !showConsentMessage && !showCodeVerification && (
                   <div className="verification-section">
                     <h3>Identity Verification</h3>
-                    <p>Verify your identity to access enhanced features and build trust within the SolSign community.</p>
+                    <p>Verify your email address to access enhanced features and receive 8 SOLSIGN tokens as a welcome reward!</p>
+                    <div className="reward-preview">
+                      <span className="reward-icon">🎁</span>
+                      <span className="reward-text">Get 8 SOLSIGN tokens upon verification</span>
+                    </div>
                     <button 
                       className="verify-button"
                       onClick={handleVerifyClick}
@@ -285,7 +457,7 @@ const Profile = () => {
                           className="submit-button"
                           disabled={isSubmitting}
                         >
-                          {isSubmitting ? 'Submitting...' : 'Submit Verification'}
+                          {isSubmitting ? 'Sending Code...' : 'Send Verification Code'}
                         </button>
                         <button 
                           type="button" 
@@ -308,8 +480,61 @@ const Profile = () => {
                   </div>
                 )}
 
+                {showCodeVerification && (
+                  <div className="code-verification-form">
+                    <h3>Email Verification</h3>
+                    <p>Enter the 6-digit verification code sent to your email address.</p>
+                    <form onSubmit={handleCodeVerification}>
+                      <div className="form-group">
+                        <label htmlFor="verificationCode">Verification Code *</label>
+                        <input
+                          type="text"
+                          id="verificationCode"
+                          name="verificationCode"
+                          value={verificationCode}
+                          onChange={handleCodeChange}
+                          required
+                          placeholder="Enter 6-digit code"
+                          maxLength="6"
+                          className="code-input"
+                        />
+                      </div>
+
+                      <div className="form-actions">
+                        <button 
+                          type="submit" 
+                          className="submit-button"
+                          disabled={isVerifyingCode || verificationCode.length !== 6}
+                        >
+                          {isVerifyingCode ? 'Verifying...' : 'Verify Code'}
+                        </button>
+                        <button 
+                          type="button" 
+                          className="resend-button"
+                          onClick={handleResendCode}
+                          disabled={isResendingCode}
+                        >
+                          {isResendingCode ? 'Resending...' : 'Resend Code'}
+                        </button>
+                        <button 
+                          type="button" 
+                          className="cancel-button"
+                          onClick={() => {
+                            setShowCodeVerification(false);
+                            setVerificationCode('');
+                            setVerificationStatus('not_verified');
+                          }}
+                          disabled={isVerifyingCode}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
                 {submitMessage && (
-                  <div className={`submit-message ${submitMessage.includes('✅') ? 'success' : 'error'}`}>
+                  <div className={`submit-message ${submitMessage.includes('✅') || submitMessage.includes('🎉') ? 'success' : 'error'}`}>
                     {submitMessage}
                   </div>
                 )}
