@@ -1,0 +1,175 @@
+.face-verification-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.verification-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.verification-header h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  background: #007bff;
+  transform: scale(1.2);
+}
+
+.progress-dot.completed {
+  background: #28a745;
+}
+
+.camera-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.camera-video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.detection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.verification-content {
+  text-align: center;
+}
+
+.instruction-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16px;
+  min-height: 24px;
+}
+
+.countdown {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.verification-controls {
+  margin-bottom: 20px;
+}
+
+.start-button,
+.retry-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.start-button:hover,
+.retry-button:hover {
+  background: #0056b3;
+}
+
+.start-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.privacy-notice {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 3px solid #007bff;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .face-verification-card {
+    margin: 0 16px;
+    padding: 20px;
+  }
+  
+  .camera-container {
+    max-width: 100%;
+  }
+  
+  .instruction-text {
+    font-size: 16px;
+  }
+  
+  .start-button,
+  .retry-button {
+    width: 100%;
+    padding: 14px 24px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .progress-dot {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .progress-dot {
+    border: 2px solid #000;
+  }
+  
+  .start-button,
+  .retry-button {
+    border: 2px solid #000;
+  }
+}

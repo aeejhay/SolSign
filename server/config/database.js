@@ -70,6 +70,26 @@ const initDatabase = async () => {
       )
     `);
 
+    // Create transactions table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS transactions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        tx_hash VARCHAR(88) NOT NULL UNIQUE,
+        doc_hash VARCHAR(64) NOT NULL,
+        signer_pubkey VARCHAR(44) NOT NULL,
+        ssign_amount DECIMAL(18,9) NOT NULL,
+        signed_at TIMESTAMP NOT NULL,
+        explorer_url TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        INDEX idx_tx_hash (tx_hash),
+        INDEX idx_doc_hash (doc_hash),
+        INDEX idx_signer_pubkey (signer_pubkey),
+        INDEX idx_signed_at (signed_at)
+      )
+    `);
+
     console.log('✅ Database tables initialized');
     connection.release();
   } catch (error) {

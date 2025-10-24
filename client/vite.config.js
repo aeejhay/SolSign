@@ -13,4 +13,24 @@ export default defineConfig({
       }
     }
   },
+  define: {
+    global: 'globalThis',
+    'process.env': {},
+  },
+  resolve: {
+    alias: {
+      crypto: 'crypto-browserify',
+      stream: 'stream-browserify',
+      buffer: 'buffer',
+    },
+  },
+  optimizeDeps: {
+    include: ['@tensorflow/tfjs', '@tensorflow-models/face-detection', '@mediapipe/face_detection'],
+    exclude: ['@tensorflow/tfjs-node'],
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
 })

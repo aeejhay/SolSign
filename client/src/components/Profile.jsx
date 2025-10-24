@@ -2,6 +2,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useState, useEffect } from 'react';
 import MenuBar from './MenuBar';
 import Galaxy from './Galaxy';
+import SimpleFaceVerificationCard from './profile/SimpleFaceVerificationCard';
 import './Profile.css';
 
 const Profile = () => {
@@ -9,6 +10,7 @@ const Profile = () => {
   const [showVerificationForm, setShowVerificationForm] = useState(false);
   const [showConsentMessage, setShowConsentMessage] = useState(false);
   const [showCodeVerification, setShowCodeVerification] = useState(false);
+  const [showFaceVerification, setShowFaceVerification] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -22,6 +24,7 @@ const Profile = () => {
   const [isResendingCode, setIsResendingCode] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [verificationStatus, setVerificationStatus] = useState('not_verified');
+  const [faceVerificationStatus, setFaceVerificationStatus] = useState('not_verified');
   const [transactionInfo, setTransactionInfo] = useState(null);
 
   // Update wallet address when publicKey changes
@@ -38,6 +41,7 @@ const Profile = () => {
   useEffect(() => {
     if (connected && publicKey) {
       checkVerificationStatus();
+      checkFaceVerificationStatus();
     }
   }, [connected, publicKey]);
 
@@ -65,6 +69,18 @@ const Profile = () => {
     }
   };
 
+  const checkFaceVerificationStatus = async () => {
+    try {
+      const response = await fetch(`/api/verification/status?userId=${publicKey.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setFaceVerificationStatus(data.verified ? 'verified' : 'not_verified');
+      }
+    } catch (error) {
+      console.log('No face verification record found or error checking status');
+    }
+  };
+
   const handleVerifyClick = () => {
     setShowConsentMessage(true);
   };
@@ -72,8 +88,21 @@ const Profile = () => {
   const handleConsentAccept = () => {
     if (consentGiven) {
       setShowConsentMessage(false);
-      setShowVerificationForm(true);
+      setShowFaceVerification(true);
     }
+  };
+
+  const handleFaceVerificationComplete = (payload) => {
+    console.log('Face verification completed:', payload);
+    setFaceVerificationStatus('verified');
+    setShowFaceVerification(false);
+    setShowVerificationForm(true);
+    setSubmitMessage('✅ Face verification successful! Please complete your profile information below.');
+  };
+
+  const handleFaceVerificationError = (error) => {
+    console.error('Face verification error:', error);
+    setSubmitMessage(`❌ Face verification failed: ${error}`);
   };
 
   const handleInputChange = (e) => {
@@ -223,6 +252,15 @@ const Profile = () => {
     }
   };
 
+  const getFaceVerificationStatusDisplay = () => {
+    switch (faceVerificationStatus) {
+      case 'verified':
+        return <span className="verification-status verified">✅ Face Verified</span>;
+      default:
+        return <span className="verification-status not-verified">❌ Face Not Verified</span>;
+    }
+  };
+
   if (!connected) {
     return (
       <>
@@ -285,8 +323,12 @@ const Profile = () => {
                     <span className="value">{formatAddress(publicKey?.toString())}</span>
                   </div>
                   <div className="profile-item">
-                    <span className="label">Verification Status:</span>
+                    <span className="label">Email Verification:</span>
                     {getStatusDisplay()}
+                  </div>
+                  <div className="profile-item">
+                    <span className="label">Face Verification:</span>
+                    {getFaceVerificationStatusDisplay()}
                   </div>
                 </div>
 
@@ -327,10 +369,10 @@ const Profile = () => {
                   </div>
                 )}
 
-                {verificationStatus !== 'verified' && !showVerificationForm && !showConsentMessage && !showCodeVerification && (
+                {verificationStatus !== 'verified' && !showVerificationForm && !showConsentMessage && !showCodeVerification && !showFaceVerification && (
                   <div className="verification-section">
                     <h3>Identity Verification</h3>
-                    <p>Verify your email address to access enhanced features and receive 8 SOLSIGN tokens as a welcome reward!</p>
+                    <p>Complete face verification and email verification to access enhanced features and receive 8 SOLSIGN tokens as a welcome reward!</p>
                     <div className="reward-preview">
                       <span className="reward-icon">🎁</span>
                       <span className="reward-text">Get 8 SOLSIGN tokens upon verification</span>
@@ -344,13 +386,26 @@ const Profile = () => {
                   </div>
                 )}
 
+                {showFaceVerification && (
+                  <SimpleFaceVerificationCard
+                    userId={publicKey?.toString() || 'demo-user-1'}
+                    onVerified={handleFaceVerificationComplete}
+                    onError={handleFaceVerificationError}
+                  />
+                )}
+
                 {showConsentMessage && (
                   <div className="consent-message">
                     <h3>Data Collection Consent</h3>
                     <div className="consent-text">
                       <p>
-                        <strong>Important:</strong> When you start the verification process, we will gather information such as your username, wallet address, email, and phone number. This data will be securely stored in our database.
+                        <strong>Important:</strong> When you start the verification process, we will:
                       </p>
+                      <ul>
+                        <li>Perform face verification using your camera (video never leaves your device)</li>
+                        <li>Gather information such as your username, wallet address, email, and phone number</li>
+                        <li>Securely store this data in our database</li>
+                      </ul>
                       <p>
                         <strong>GDPR Compliance:</strong> We are committed to protecting your privacy and complying with the General Data Protection Regulation (GDPR). Your personal data will be:
                       </p>
